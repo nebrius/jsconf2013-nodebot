@@ -12,12 +12,12 @@ function init(board, config) {
 	// Initialize the servos
 	for (servo in config) {
 		state[servo] = {
-			position: 90,
-			destination: 90,
+			position: config[servo].defaultPosition,
+			destination: config[servo].defaultPosition,
 			controller: new five.Servo(config[servo].port),
 			callback: null
 		};
-		state[servo].controller.center();
+		state[servo].controller.move(config[servo].defaultPosition);
 	}
 
 	// Servo event loop
@@ -38,7 +38,7 @@ function init(board, config) {
 				}
 			}
 		}
-	}, 20);
+	}, 6);
 }
 
 function moveServo(servo, position, callback) {
