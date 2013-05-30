@@ -4,17 +4,6 @@ var five = require('johnny-five'),
 
 board = new five.Board();
 
-var keys = {
-		a: {
-			servo1: 90,
-			servo2: 90,
-			servo3: 90
-		}
-	},
-	STATE_IDLE = 0
-	STATE_MOVING = 1,
-	STATE_PRESSING;
-
 board.on('ready', function() {
 
 	// Create a new `servo` hardware instance.
@@ -30,18 +19,81 @@ board.on('ready', function() {
 		}
 	});
 
+	var keys = {
+			a: {
+				servo1: 90,
+				servo2: 90,
+				servo3: 90
+			},
+			b: {
+				servo1: 80,
+				servo2: 80,
+				servo3: 80
+			}
+		},
+		resetPosition = {
+			servo1: 90,
+			servo2: 30,
+			servo3: 30
+		},
+		sequence = ['a', 'a', 'b', 'a', 'b'],
+		currentSequence = -1,
+		counter,
+		STATE_IDLE = 0,
+		STATE_MOVING = 1,
+		STATE_PRESSING = 2,
+		STATE_RELEASING = 3,
+		state = STATE_IDLE;
 
-	/*var key = keys.a,
-		state = 0,
-
-	setInterval(function () {
-		var position = positions[current],
-			servo;
-		for (servo in position) {
-			servocontrol.moveServo(servo, position[servo]);
+	function tick() {
+		var key = keys[sequence[currentSequence]];
+		switch(state) {
+			case STATE_IDLE:
+				currentSequence++;
+				var key = keys[sequence[currentSequence]];
+				console.log('\nPressing key ' + sequence[currentSequence]);
+				console.log('Moving the arm');
+				state = STATE_MOVING;
+				counter = 0;
+				function movingStateCallback() {
+					counter++;
+					if (counter === 2) {
+						setTimeout(tick, 1000);
+					}
+				}
+				servocontrol.moveServo('servo1', key.servo1, movingStateCallback);
+				servocontrol.moveServo('servo2', key.servo2, movingStateCallback);
+				break;
+			case STATE_MOVING:
+				console.log('Pressing the key');
+				state = STATE_PRESSING;
+				servocontrol.moveServo('servo3', key.servo3, function () {
+					setTimeout(tick, 250);
+				});
+				break;
+			case STATE_PRESSING:
+				console.log('Releasing the key');
+				state = STATE_RELEASING;
+				servocontrol.moveServo('servo3', key.servo3 + 20, function () {
+					setTimeout(tick, 1000);
+				});
+				break;
+			case STATE_RELEASING:
+				console.log('Resetting the arm');
+				state = STATE_IDLE;
+				counter = 0;
+				function releasingStateCallback() {
+					counter++;
+					if (counter === 3) {
+						setTimeout(tick, 1000);
+					}
+				}
+				servocontrol.moveServo('servo1', resetPosition.servo1, releasingStateCallback);
+				servocontrol.moveServo('servo2', resetPosition.servo2, releasingStateCallback);
+				servocontrol.moveServo('servo3', resetPosition.servo3, releasingStateCallback);
 		}
-		current++;
-	}, 2000);*/
+	}
+	tick();
 });
 
 
