@@ -1,0 +1,19 @@
+{
+  "name": "nodebots",
+  "version": "0.0.0",
+  "description": "A node.js powered robot that can type!",
+  "main": "bot.js",
+  "dependencies": {
+    "johnny-five": "~0.6.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://nebrius@bitbucket.org/nebrius/jsconf-nodebot.git"
+  },
+  "author": "",
+  "license": "BSD"
+}
